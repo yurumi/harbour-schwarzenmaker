@@ -15,7 +15,8 @@ TARGET = harbour-schwarzenmaker
 CONFIG += sailfishapp c++11
 QT += dbus
 
-SOURCES += src/harbour-schwarzenmaker.cpp
+SOURCES += src/harbour-schwarzenmaker.cpp \
+    src/applibrary.cpp
 
 OTHER_FILES += qml/harbour-schwarzenmaker.qml \
     qml/cover/CoverPage.qml \
@@ -46,4 +47,7 @@ TRANSLATIONS += translations/harbour-schwarzenmaker-de.ts
 
 RESOURCES += \
     res.qrc
+
+HEADERS += \
+    src/applibrary.h
 

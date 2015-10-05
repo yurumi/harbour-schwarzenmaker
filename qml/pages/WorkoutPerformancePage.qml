@@ -12,15 +12,6 @@ Page {
   property int entryDurationMs: 0
   property int entryElapsedTimeMs: 0
 
-  SoundEffect {
-    id: playSound
-    /* source: "/home/nemo/test.wav" */
-    source: "test.wav"
-  }
-
-
-  /* property variant soundEffect: audioengine.sounds["explosion"].newInstance(); */
-
   function buildEntriesModel(workout_name){
     entriesModel.clear();
 
@@ -32,43 +23,39 @@ Page {
 		       entriesModel.append({"iid": dbItem.iid, "title": dbItem.title, "type": dbItem.type, "duration": dbItem.duration * 1000, "description": dbItem.description});
 		     }
 		   });
-    playSound.play();
   }
 
-  function startNextEntry(){
-    root.activeEntry += 1;
-    var entry = entriesModel.get(root.activeEntry);
-    root.entryDurationMs = entry.duration
-    root.entryElapsedTimeMs = 0;
-    if(entry.type === "pause"){
-      entryTitle.text = "Pause";
-    }else{
-      entryTitle.text = entry.title;
-    }
-    entryTimer.start();
+  function proceed(){
+      activeEntry += 1;
+
+      console.log("PROCEED: ", activeEntry, " (", entriesModel.count, ")")
+      
+      if(activeEntry < entriesModel.count){
+          var entry = entriesModel.get(root.activeEntry);
+          entryDurationMs = entry.duration
+          entryElapsedTimeMs = 0;
+          if(entry.type === "pause"){
+              entryTitle.text = "Pause";
+          }else{
+              entryTitle.text = entry.title;
+          }
+          entryTimer.start();
+      }else{
+          console.log("RETURN TRANSITION")
+          pageStack.pop()
+      }
   }
 
   Component.onCompleted: {
     buildEntriesModel("workout_" + root.currentWid);
-    startNextEntry();
+    proceed();
   }
 
-  /* AudioEngine { */
-  /*   id:audioengine */
+  SoundEffect {
+    id: playSound
+    source: "qrc:/sounds/blip.wav"
+  }
 
-  /*   AudioSample { */
-  /*     name:"explosion01" */
-  /*     source: "/usr/share/skype/sounds/CallBusy.wav" */
-  /*   } */
-
-  /*   Sound { */
-  /*     name:"explosion" */
-  /*     PlayVariation { */
-  /*       sample:"explosion01" */
-  /*     } */
-  /*   } */
-  /* } */
-  
   ListModel {
     id: entriesModel
   }
@@ -76,7 +63,7 @@ Page {
   /* SilicaListView { */
   /*   id: listView */
   /*   anchors.fill: parent */
-  /*   header: PageHeader { title: root.currentWTitle + " Excercises" } */
+  /*   header: PageHeader { title: root.currentWRTitle + " Excercises" } */
   /*   highlightFollowsCurrentItem: true */
   /*   model: entriesModel */
 
@@ -112,38 +99,33 @@ Page {
   /* } */
 	
   Timer {
-    id: entryTimer
-    interval: 1000
-    repeat: true
-    triggeredOnStart: true
-    onTriggered: {
-      /* playMusic.play(); */
-      playSound.play();
-      /* root.soundEffect.play(); */  
+      id: entryTimer
+      interval: 1000
+      repeat: true
+      triggeredOnStart: true
+      onTriggered: {
+          console.log("blank")
+          appLibrary.setBlankingMode(true)
 
-      var remainingTimeMs = root.entryDurationMs - root.entryElapsedTimeMs;
+          var remainingTimeMs = root.entryDurationMs - root.entryElapsedTimeMs;
 
-      if(remainingTimeMs < 0){
-	console.log("NEXT ENTRY");
-	root.startNextEntry();
-	entryDuration.text = root.entryDurationMs / 1000;
-      }else{
-	entryDuration.text = remainingTimeMs / 1000;
-      }
+          // switch to next exercise or pause
+          if(remainingTimeMs < 0){
+              console.log("NEXT ENTRY");
+              root.proceed();
+              entryDuration.text = root.entryDurationMs / 1000;
+          }else{
+              entryDuration.text = remainingTimeMs / 1000;
 
-      entryElapsedTimeMs += entryTimer.interval;
+              // play sound for the last few seconds
+              if(remainingTimeMs <= 2000){
+                  console.log("SOUND")
+                  playSound.play();
+              }
+          }
 
-    }  
-
-    /* Audio { */
-    /*   id: playMusic */
-    /*   source: "/usr/share/skype/sounds/CallBusy.wav" // Point this to a suitable sound file */
-    /* } */
-
-    /* SoundEffect { */
-    /*   id: playSound */
-    /*   source: "/usr/share/skype/sounds/CallBusy.wav" */
-    /* } */
+          entryElapsedTimeMs += entryTimer.interval;
+      }  
   }
 
   Text {

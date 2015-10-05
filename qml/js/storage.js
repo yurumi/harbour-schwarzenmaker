@@ -58,6 +58,13 @@ function initializeDatabase() {
 		   });
 }
 
+function clearWorkoutDatabase(){
+    // var db = getDatabase();
+    // db.transaction(function(tx) {
+    // 	tx.executeSql("DROP TABLE IF EXISTS ")
+    // })
+}
+
 function printWorkout(wid) {
     var db = getDatabase();
     db.transaction(function(tx) {
@@ -126,34 +133,50 @@ function printSettings() {
 //     var db = getDatabase();
 // }
 
-function createWorkout(title){
+function createWorkout(){
     var db = getDatabase();
 
     var wid = _getFreeWid();
 
-    // add new workout to table of contents 
-    db.transaction(
-    		   function(tx) {
-    		       var query="INSERT OR REPLACE INTO toc VALUES(" + wid + ", '" + title + "');";
-    		       tx.executeSql(query);
-    		   });
+    // var title = "INIT"
+    
+    // // add new workout to table of contents
+    // db.transaction(
+    // 	function(tx) {
+    // 	    var query="INSERT OR REPLACE INTO toc VALUES(" + wid + ", '" + title + "');";
+    // 	    tx.executeSql(query);
+    // 	});
 
+    // create table for workout contents
     db.transaction(
                 function(tx) {
                     var query="CREATE TABLE IF NOT EXISTS workout_" + wid + "(wid INTEGER, iid INTEGER, title TEXT, type TEXT, duration INTEGER, description TEXT);";
                     tx.executeSql(query);
                 });
+
+    return wid;
+}
+
+function setWorkoutTitle(wid, title){
+    var db = getDatabase();
+
+    db.transaction(
+	function(tx) {
+    	    var query="INSERT OR REPLACE INTO toc VALUES(" + wid + ", '" + title + "');";
+    	    tx.executeSql(query);
+    	}
+    );
 }
 
 function deleteWorkout(widToRemove){
     var db = getDatabase();
     var ret = "";
 
-    // remove workout from table of contents 
+    // remove workout from table of contents
     db.transaction(
-    		   function(tx) {
-		       tx.executeSql('DELETE FROM toc WHERE wid=?;', [widToRemove]);
-    		   });
+    	function(tx) {
+	    tx.executeSql('DELETE FROM toc WHERE wid=?;', [widToRemove]);
+    	});
 
     db.transaction(
                 function(tx) {

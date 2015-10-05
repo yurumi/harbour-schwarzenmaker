@@ -39,12 +39,12 @@ ApplicationWindow
     cover: Qt.resolvedUrl("cover/CoverPage.qml")
 
     Component.onCompleted: {
-	console.log("DB INIT")
-	Storage.initializeDatabase()
-	Storage.printSettings()
-	Storage.printTables()
+        console.log("DB INIT")
+        Storage.initializeDatabase()
+        Storage.printSettings()
+        Storage.printTables()
 
-	pageStack.replace(Qt.resolvedUrl("pages/WorkoutPage.qml"))
+        pageStack.replace(Qt.resolvedUrl("pages/WorkoutPage.qml"))
     }
 }
 

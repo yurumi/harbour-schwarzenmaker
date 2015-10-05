@@ -41,6 +41,7 @@
 #include <QProcess>
 #include <QQuickView>
 #include <notification.h>
+#include "applibrary.h"
 
 int main(int argc, char *argv[])
 {
@@ -49,9 +50,13 @@ int main(int argc, char *argv[])
 
   qmlRegisterType<Notification>("harbour.schwarzenmaker.notifications", 1, 0, "Notification");
 
+  appLibrary* applib = new appLibrary();
+
   QScopedPointer<QQuickView> view(SailfishApp::createView());
   QQmlEngine* engine = view->engine();
   QObject::connect(engine, SIGNAL(quit()), application.data(), SLOT(quit()));
+
+  view->rootContext()->setContextProperty("appLibrary", applib);
 
   view->setSource(SailfishApp::pathTo("qml/harbour-schwarzenmaker.qml"));
   view->show();

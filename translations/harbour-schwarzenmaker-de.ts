@@ -2,6 +2,39 @@
 <!DOCTYPE TS>
 <TS version="2.1">
 <context>
+    <name></name>
+    <message id="workouts-overview">
+        <source>Workout overview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="edit-workout">
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="remove-workout">
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="create-workout">
+        <source>Create workout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="save-edited-workout">
+        <source>Save Workout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="workout_name_editpage">
+        <source>Workout name</source>
+        <extracomment>The placeholder for the name of the currently edited / created workout</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="workout_name_label_editpage">
+        <source>Workout name</source>
+        <extracomment>The label for the textfield in which the name of the currently edited / created workout is entered</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CoverPage</name>
     <message>
         <source>My Cover</source>
@@ -9,29 +42,14 @@
     </message>
 </context>
 <context>
-    <name>FirstPage</name>
+    <name>WorkoutPage</name>
     <message>
-        <source>Show Page 2</source>
-        <translation type="vanished">Zur Seite 2</translation>
+        <source>Clear local database</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>UI Template</source>
-        <translation type="vanished">UI-Vorlage</translation>
-    </message>
-    <message>
-        <source>Hello Sailors</source>
-        <translation type="vanished">Hallo Matrosen</translation>
-    </message>
-</context>
-<context>
-    <name>SecondPage</name>
-    <message>
-        <source>Nested Page</source>
-        <translation type="vanished">Unterseite</translation>
-    </message>
-    <message>
-        <source>Item</source>
-        <translation type="vanished">Element</translation>
+        <source>Database is going to be cleared</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

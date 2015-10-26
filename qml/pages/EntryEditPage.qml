@@ -69,10 +69,10 @@ Dialog {
 	id: durationSlider
 	width: parent.width
 	label: "Exercise Duration"
-	minimumValue: 1
+    minimumValue: 0
 	maximumValue: 300
 	value: 20
-	stepSize: 1
+    stepSize: 5
 	valueText: value + "s"
       } 
 
@@ -87,7 +87,7 @@ Dialog {
 	      root.model.append({"iid": dbItem["iid"], "title": dbItem["title"], "type": dbItem["type"], "duration": dbItem["duration"], "description": dbItem["description"]});
 	  }else{
 	      console.log("SET EXERCISE (WID: " + root.currentWid + ")");
-	      var dbItem = Storage.setExerciseInWorkout(root.currentWid, root.currentIid, root.title, root.description, root.duration);
+	      var dbItem = Storage.setExerciseInWorkout(root.currentIid, root.currentWid, root.title, root.description, root.duration);
 	      root.model.setProperty(root.currentIndex, "title", dbItem["title"]);
 	      root.model.setProperty(root.currentIndex, "description", dbItem["description"]);
 	      root.model.setProperty(root.currentIndex, "duration", dbItem["duration"]);

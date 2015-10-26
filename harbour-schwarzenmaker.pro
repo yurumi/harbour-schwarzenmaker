@@ -13,10 +13,11 @@
 TARGET = harbour-schwarzenmaker
 
 CONFIG += sailfishapp c++11
-QT += dbus
+QT += dbus gui-private
 
 SOURCES += src/harbour-schwarzenmaker.cpp \
-    src/applibrary.cpp
+    src/applibrary.cpp \
+    src/viewhelper.cpp
 
 OTHER_FILES += qml/harbour-schwarzenmaker.qml \
     qml/cover/CoverPage.qml \
@@ -31,7 +32,10 @@ OTHER_FILES += qml/harbour-schwarzenmaker.qml \
     qml/pages/WorkoutEditPage.qml \
     qml/pages/WorkoutItemDelegate.qml \
     qml/pages/WorkoutPerformancePage.qml \
-    qml/pages/WorkoutPage.qml
+    qml/pages/WorkoutPage.qml \
+    qml/components/IconContextMenu.qml \
+    qml/components/IconMenuItem.qml \
+    qml/js/storage.js
 
 include(third_party/notifications.pri)
 
@@ -49,5 +53,6 @@ RESOURCES += \
     res.qrc
 
 HEADERS += \
-    src/applibrary.h
+    src/applibrary.h \
+    src/viewhelper.h
 

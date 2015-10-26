@@ -43,7 +43,7 @@ ApplicationWindow
         Storage.initializeDatabase()
         Storage.printSettings()
         Storage.printTables()
-
+        
         pageStack.replace(Qt.resolvedUrl("pages/WorkoutPage.qml"))
     }
 }

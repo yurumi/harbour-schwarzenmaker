@@ -23,22 +23,22 @@ Page {
 
         var entries;
         db.transaction(function(tx) {
-            // console.log("GET ENTRIES FOR ", dbItem.wtitle)
-            entries = tx.executeSql("SELECT * FROM workout_" + dbItem.wid + ";");
+            var tableName = "workout_" + dbItem.wid
+            entries = tx.executeSql("SELECT * FROM " + tableName + ";");
         });
 
         var wduration = 0
-        for(var j = 0; j < entries.length; j++){
-            wduration += entries.item(j).duration
+        for(var j = 0; j < entries.rows.length; j++){
+            wduration += entries.rows.item(j).duration
         }
         
         overviewModel.append({"wid": dbItem.wid, "wtitle": dbItem.wtitle, "wduration": wduration});
     }
 
   }
-
+  
   Component.onCompleted: {
-    createWorkoutList();
+      createWorkoutList();
   }
 
   onStatusChanged: {
@@ -46,7 +46,6 @@ Page {
             createWorkoutList();
         }
   }
-
 
   ListModel {
       id: overviewModel
@@ -63,44 +62,64 @@ Page {
         title: qsTrId("workouts-overview")
     }
     delegate: ListItem {
-	id: workoutDelegate
-	width: listView.width
-	menu: contextMenu
+        id: workoutDelegate
+        menu: contextMenu
+        width: parent.width
+        // anchors {
+        //     left: parent.left
+        //     right: parent.right
+        //     margins: Theme.paddingLarge
+        // }
 
-	function edit() {
-     pageStack.push(Qt.resolvedUrl("WorkoutEditPage.qml"), {"currentWid": wid, "currentWTitle": wtitle})
-	}
+        function edit() {
+            pageStack.push(Qt.resolvedUrl("WorkoutEditPage.qml"), {"currentWid": wid, "currentWTitle": wtitle})
+        }
 
-	function remove() {
-	    remorseAction("Deleting", function() { 
-			      Storage.deleteWorkout(wid);
-			      listView.model.remove(index);
-			  })
-	}
+        function remove() {
+            remorseAction("Deleting", function() { 
+                Storage.deleteWorkout(wid);
+                listView.model.remove(index);
+            })
+        }
 
+        Row{
+            id: delegateRow
+            anchors {
+                left: parent.left
+                right: parent.right
+                margins: Theme.paddingLarge
+                verticalCenter: parent.verticalCenter
+            }
+            
+            Label {
+                // width: workoutDelegate.width - durationLBL.width
+                width: delegateRow.width - durationLBL.width
+                text: model.wtitle
+            }
+            
+            Label {
+                id: durationLBL
+                width: 50
+                horizontalAlignment: Text.AlignRight
+                text: {
+                    if(model.wduration >= 60){
+                        var minutes = Math.floor(model.wduration / 60)
+                        var seconds = model.wduration % 60
+                        return (minutes + "' " + seconds + "\"")
+                    }else{
+                        return (model.wduration + "\"")
+                    }         
+                }
+                // x: Theme.paddingLarge
+            }
+        }
 
- Row{
-     Label {
-         width: 400
-	    text: model.wtitle
-	    x: Theme.paddingLarge
-	}
- Label {
-     width: 50
-	    text: model.wduration
-	    x: Theme.paddingLarge
-	}
- }
- 
- 
+        onClicked: {
+            pageStack.push(Qt.resolvedUrl("WorkoutPerformancePage.qml"), {"currentWid": model.wid,
+            "currentWTitle": model.wtitle})
+        }
 
-	onClicked: {
-	    pageStack.push(Qt.resolvedUrl("WorkoutPerformancePage.qml"), {"currentWid": model.wid,
-	    								    "currentWTitle": model.wtitle
-	    								   })
-	}
-
-	Component {
+        Component {
             id: contextMenu
             ContextMenu {
                 MenuItem {
@@ -115,17 +134,13 @@ Page {
                 }
             }
         }
-    }
+    } // delegate
 
     PullDownMenu {
         MenuItem {
-            text: qsTr("Clear local database")
+            text: qsTr("Settings")
             onClicked: {
-                remorseClearDatabase.execute(qsTr("Database is going to be cleared"),
-                function() {
-                    Storage.clear();
-                }
-                )
+                pageStack.push(Qt.resolvedUrl("SettingsPage.qml"))
             }
         }
 
@@ -136,11 +151,10 @@ Page {
                 pageStack.push(Qt.resolvedUrl("WorkoutEditPage.qml"))
             }
         }
-
-
-    }
+    } // PullDownMenu
 
     VerticalScrollDecorator {}
-  }
+
+  } // listview
 
 }

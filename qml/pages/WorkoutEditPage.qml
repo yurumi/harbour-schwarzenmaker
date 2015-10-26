@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../components"
 import "../js/storage.js" as Storage
 import "../js/env.js" as Env
 
@@ -14,7 +15,8 @@ Dialog {
 
         var db = Storage.getDatabase();
         db.transaction(function(tx) {
-            var rs = tx.executeSql("SELECT * FROM " + workout_name + ";");
+            console.log("showWorkout SQL statement: ", "SELECT * FROM " + workout_name + " ORDER BY iid;")
+            var rs = tx.executeSql("SELECT * FROM " + workout_name + " ORDER BY iid;");
             console.log("Items for workout ", workout_name, ": ", rs.rows.length)
             for(var i = 0; i < rs.rows.length; i++) {
                 var dbItem = rs.rows.item(i);
@@ -24,6 +26,15 @@ Dialog {
         });
     }
 
+    function swapItems(indexFirst, indexSecond){
+        var oldIidFirst = workoutModel.get(indexFirst).iid;
+        var oldIidSecond = workoutModel.get(indexSecond).iid;
+        Storage.swapItemId(currentWid, oldIidFirst, oldIidSecond)
+        workoutModel.setProperty(indexFirst, "iid", oldIidSecond)
+        workoutModel.setProperty(indexSecond, "iid", oldIidFirst)
+        workoutModel.move(indexFirst, indexSecond, 1)
+    }
+    
     Component.onCompleted: {
         // editing an existing workout
         if(currentWid != -1){
@@ -35,22 +46,21 @@ Dialog {
         else{
             console.log("CREATE NEW WORKOUT")
             staging = true;
-            root.currentWid = Storage.createWorkout();
+            root.currentWid = Storage.createWorkout(-1);
         }
     }
 
     onStatusChanged: {
         if(status === PageStatus.Activating){
-            showWorkout("workout_" + root.currentWid);
+            showWorkout(Storage.getWorkoutTableNameFromId(currentWid));
         }
     }
 
     // user wants to save new entry data
     // onAccepted: {
     onRejected: {
-        console.log("SAVE WORKOUT: ", root.currentWTitle)
-        Storage.setWorkoutTitle(root.currentWid, root.currentWTitle)
-        // root.workoutListChanged()
+        console.log("SAVE WORKOUT: ", currentWTitle, " ", currentWid)
+        Storage.setWorkoutTitle(currentWid, currentWTitle)
     }
 
     // user has rejected editing entry data, check if there are unsaved details
@@ -67,6 +77,12 @@ Dialog {
         id: itemList
         anchors.fill: parent
         model: ListModel{ id: workoutModel }
+        move: Transition {
+            NumberAnimation { properties: "x"; duration: 200 }
+        }
+        moveDisplaced: Transition {
+            NumberAnimation { properties: "x"; duration: 200 }
+        }
 
         VerticalScrollDecorator { flickable: itemList }
 
@@ -100,18 +116,15 @@ Dialog {
         //     /* delegate: WorkoutItemDelegate {model: workoutModel; wid: root.currentWid} */
         delegate: ListItem {
             id: workoutItemDelegate
-                   
+            width: parent.width
             menu: contextMenu
-            anchors {
-                left: parent.left
-                right: parent.right
-                margins: Theme.paddingLarge
-            }
+            
+            // anchors {
+            //     left: parent.left
+            //     right: parent.right
+            //     margins: Theme.paddingLarge
+            // }
 
-            //        /* property int titleRowHeight: 40 */
-            //        /* property int descriptionRowHeight: (type === "pause") ? 0 : 40 */
-            //        /* height: (type === "pause") ? 40 : (40 + descriptionLabel.height) */
-            property variant model: workoutModel
             property int wid: currentWid
 
             function edit() {
@@ -124,7 +137,7 @@ Dialog {
                 "edit": true,
                 "title": title,
                 "description": description,
-                "duration": duration})
+                "duration": duration});
         	 }
           
         	 function remove() {
@@ -134,42 +147,86 @@ Dialog {
               }, 2000)
         	 }
 
+            onClicked: { showMenu() }
+          
             Component {
              id: contextMenu
-             ContextMenu {
-                 MenuItem {
-                	 text: "Edit"
-                	 onClicked: edit()
+             IconContextMenu {
+                 IconMenuItem {
+                     text: "Edit"
+                     icon.source: "image://theme/icon-m-edit"
+                     onClicked: {
+                         hideMenu()
+                         edit()
+                     }
                  }
-                 MenuItem {
-                	 text: "Remove"
-                	 onClicked: remove()
+                 IconMenuItem {
+                     text: "Remove"
+                     icon.source: "image://theme/icon-m-delete"
+                     onClicked: {
+                         hideMenu()
+                         remove()
+                     }
+                 }
+                 IconMenuItem {
+                     text: "Move up"
+                     icon.source: "image://theme/icon-l-up"
+                     onClicked: {
+                         if(index > 0) {
+                             swapItems(index, index - 1);
+                         }
+                     }
+                 }
+                 IconMenuItem {
+                     text: "Move down"
+                     icon.source: "image://theme/icon-l-down"
+                     onClicked: {
+                         if(index < (workoutModel.count - 1)) {
+                             swapItems(index, index + 1);
+                         }
+                     }
                  }
              }
             }		
 
             Column {
+                id: delegateColumn
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.paddingLarge
+                }
+
                 Row {
+                    width: parent.width
                     Label {
-                        width: workoutItemDelegate.width - durationLBL.width
+                        width: parent.width - durationLBL.width
                         text: if(type === "pause"){"Pause"}else{title}
                         color: if(type === "pause"){Theme.secondaryColor}else{Theme.primaryColor}
                     }
                     Label {
                         id: durationLBL
                         width: 50
-                        text: duration
+                        text: duration + "\""
                         color: if(type === "pause"){Theme.secondaryColor}else{Theme.primaryColor}
                     }
                 } // Row
 
                 Label {
                     id: descriptionLabel
-                    width: workoutItemDelegate.width / 3 * 2
+                    // width: workoutItemDelegate.width / 3 * 2
+                    width: parent.width
                     text: if(type === "pause"){"PPPP"}else{description}
                     font.pixelSize: Theme.fontSizeTiny
                     visible: (type === "exercise") ? true : false
                 }
+
+                // Label {
+                //     id: iidLBL
+                //     width: workoutItemDelegate.width
+                //     text: iid
+                //     color: Theme.secondaryColor
+                // }
             } // Column
         } // delegate
 

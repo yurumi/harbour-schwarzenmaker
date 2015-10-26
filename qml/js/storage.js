@@ -32,6 +32,12 @@ function initializeDatabase() {
 
     db.transaction(
 		   function(tx) {
+		       var query="INSERT INTO settings VALUES('AudibleTimerVolume', '0.5');";
+		       tx.executeSql(query);
+		   });
+
+    db.transaction(
+		   function(tx) {
 		       var query="INSERT INTO settings VALUES('AudibleTimerNumEvents', '3');";
 		       tx.executeSql(query);
 		   });
@@ -44,13 +50,36 @@ function initializeDatabase() {
 
     db.transaction(
 		   function(tx) {
-		       var query="INSERT INTO settings VALUES('DefaultExcerciseDuration', '30');";
+		       var query="INSERT INTO settings VALUES('DefaultExcerciseDuration', '40');";
+		       tx.executeSql(query);
+		   });
+
+    db.transaction(
+		   function(tx) {
+		       var query="INSERT INTO settings VALUES('Orientation', '0');";
+		       tx.executeSql(query);
+		   });
+
+    db.transaction(
+		   function(tx) {
+		       var query="INSERT INTO settings VALUES('OverlayOpacity', '0.7');";
+		       tx.executeSql(query);
+		   });
+
+    db.transaction(
+		   function(tx) {
+		       var query="INSERT INTO settings VALUES('OverlayProgressBarThickness', '5');";
 		       tx.executeSql(query);
 		   });
 
     ////////////////////////////////
     // create table of contents
     ////////////////////////////////
+    initTocTable();
+}
+
+function initTocTable() {
+    var db = getDatabase();
     db.transaction(
 		   function(tx) {
 		       var query="CREATE TABLE IF NOT EXISTS toc(wid INTEGER UNIQUE PRIMARY KEY ON CONFLICT IGNORE, wtitle TEXT);";
@@ -59,16 +88,27 @@ function initializeDatabase() {
 }
 
 function clearWorkoutDatabase(){
-    // var db = getDatabase();
-    // db.transaction(function(tx) {
-    // 	tx.executeSql("DROP TABLE IF EXISTS ")
-    // })
+    var db = getDatabase();
+
+    db.transaction(function(tx) {
+     	var rs = tx.executeSql("SELECT wid FROM toc;")
+	for(var i = 0; i < rs.rows.length; i++){
+	    console.log("DROP WORKOUT TABLE ", getWorkoutTableNameFromId(rs.rows.item(i).wid) )
+	    tx.executeSql("DROP TABLE IF EXISTS " + getWorkoutTableNameFromId(rs.rows.item(i).wid + ";"))
+	}
+    })
+
+    db.transaction(function(tx) {
+	console.log("DROP TOC TABLE")
+     	tx.executeSql("DROP TABLE IF EXISTS toc")
+    })
+    initTocTable()
 }
 
 function printWorkout(wid) {
     var db = getDatabase();
     db.transaction(function(tx) {
-        var rs = tx.executeSql("SELECT * FROM workout_" + wid + ";");
+        var rs = tx.executeSql("SELECT * FROM " + getWorkoutTableNameFromId(wid) + ";");
         for(var i = 0; i < rs.rows.length; i++) {
             var dbItem = rs.rows.item(i);
             console.log("IID: " + dbItem.iid + " Title: " + dbItem.title + " Type: " + dbItem.type + " Duration: " + dbItem.duration + " Desc: " + dbItem.description);
@@ -99,6 +139,8 @@ function getSetting(setting) {
         }
     })
 
+    console.log("Get Setting ", setting, " --> ", ret)
+    
     return ret
 }
 
@@ -115,6 +157,8 @@ function setSetting(setting, value) {
     }
     );
 
+    console.log("Set Setting ", setting, "::", value, " --> ", ret)
+    
     return ret;
 }
 
@@ -129,28 +173,20 @@ function printSettings() {
     });
 }
 
-// function addWorkoutElement(title, type, duration, description) {
-//     var db = getDatabase();
-// }
-
-function createWorkout(){
+function createWorkout(wid){
     var db = getDatabase();
 
-    var wid = _getFreeWid();
-
-    // var title = "INIT"
+    if(wid === -1){
+	wid = _getFreeWid();
+    }
     
-    // // add new workout to table of contents
-    // db.transaction(
-    // 	function(tx) {
-    // 	    var query="INSERT OR REPLACE INTO toc VALUES(" + wid + ", '" + title + "');";
-    // 	    tx.executeSql(query);
-    // 	});
-
     // create table for workout contents
     db.transaction(
                 function(tx) {
-                    var query="CREATE TABLE IF NOT EXISTS workout_" + wid + "(wid INTEGER, iid INTEGER, title TEXT, type TEXT, duration INTEGER, description TEXT);";
+                    // var query="CREATE TABLE IF NOT EXISTS workout_" + wid + "(iid INTEGER UNIQUE PRIMARY KEY ON CONFLICT IGNORE, wid INTEGER, title TEXT, type TEXT, duration INTEGER, description TEXT);";
+                    var query="CREATE TABLE IF NOT EXISTS " + getWorkoutTableNameFromId(wid) + "(iid INTEGER, wid INTEGER, title TEXT, type TEXT, duration INTEGER, description TEXT);";
+
+		    console.log("createWorkout SQL  statement: ", query)
                     tx.executeSql(query);
                 });
 
@@ -166,6 +202,25 @@ function setWorkoutTitle(wid, title){
     	    tx.executeSql(query);
     	}
     );
+}
+
+function swapItemId(workoutId, firstItemId, secondItemId){
+    var db = getDatabase();
+    var firstItem;
+    var secondItem;
+    var workoutName = getWorkoutTableNameFromId(workoutId);
+
+    db.transaction(function(tx) {
+	firstItem = tx.executeSql("SELECT * FROM " + workoutName + " WHERE iid = ?;", [firstItemId]);   
+	secondItem = tx.executeSql("SELECT * FROM " + workoutName + " WHERE iid = ?;", [secondItemId]); });
+
+    if( (firstItem.rows.length != 0) && (secondItem.rows.length != 0) ){
+	db.transaction(function(tx) {
+	    tx.executeSql("UPDATE " + workoutName + " SET iid=-1 WHERE iid=?;", [secondItemId])
+	    tx.executeSql("UPDATE " + workoutName + " SET iid=? WHERE iid=?;", [secondItemId, firstItemId])
+	    tx.executeSql("UPDATE " + workoutName + " SET iid=? WHERE iid=?;", [firstItemId, -1])
+	})
+    }
 }
 
 function deleteWorkout(widToRemove){
@@ -189,31 +244,32 @@ function deleteWorkout(widToRemove){
 
 function addExerciseToWorkout(wid, title, duration, description) {
     var db = getDatabase();
-    var iid = _getNextIid(wid);
+    var iid = _getFreeIid(wid);
 
     db.transaction(
 	function(tx) {
-	    var query="INSERT INTO workout_" + wid 
+	    var query="INSERT INTO " + getWorkoutTableNameFromId(wid)
 		+ " VALUES(" 
-		+ wid + ", " 
 		+ iid + ", " 
+		+ wid + ", " 
 		+ "'" + title + "', 'exercise', " 
 		+ duration + ", " 
 		+ "'" + description + "');";
+	    console.log("addExerciseToWorkout SQL query: ", query)
 	    tx.executeSql(query);
 	});
 
     return {"iid": iid, "title": title, "type": "exercise", "duration": duration, "description": description};
 }
 
-function setExerciseInWorkout(wid, iid, title, description, duration) {
+function setExerciseInWorkout(iid, wid, title, description, duration) {
     var db = getDatabase();
 
     db.transaction(
 	function(tx) {
-	    tx.executeSql('UPDATE workout_' + wid + ' SET title =? WHERE iid =?;', [title, iid]);
-	    tx.executeSql('UPDATE workout_' + wid + ' SET description =? WHERE iid =?;', [description, iid]);
-	    tx.executeSql('UPDATE workout_' + wid + ' SET duration =? WHERE iid =?;', [duration, iid]);
+	    tx.executeSql('UPDATE ' + getWorkoutTableNameFromId(wid) + ' SET title =? WHERE iid =?;', [title, iid]);
+	    tx.executeSql('UPDATE ' + getWorkoutTableNameFromId(wid) + ' SET description =? WHERE iid =?;', [description, iid]);
+	    tx.executeSql('UPDATE ' + getWorkoutTableNameFromId(wid) + ' SET duration =? WHERE iid =?;', [duration, iid]);
 	});
 
     return {"iid": iid, "title": title, "type": "exercise", "duration": duration, "description": description };
@@ -221,11 +277,12 @@ function setExerciseInWorkout(wid, iid, title, description, duration) {
 
 function addPauseToWorkout(wid, duration) {
     var db = getDatabase();
-    var iid = _getNextIid(wid);
+    var iid = _getFreeIid(wid);
 
     db.transaction(
 	function(tx) {
-	    var query="INSERT INTO workout_" + wid + " VALUES(" + wid + ", " + iid + ", '', 'pause', " + duration + ", '');";
+	    var query="INSERT INTO workout_" + wid + " VALUES(" + iid + ", " + wid + ", '', 'pause', " + duration + ", '');";
+	    console.log("addPauseToWorkout SQL query: ", query)
 	    tx.executeSql(query);
 	});
 
@@ -237,7 +294,7 @@ function setPauseInWorkout(wid, iid, duration) {
 
     db.transaction(
 	function(tx) {
-	    tx.executeSql('UPDATE workout_' + wid + ' SET duration =? WHERE iid =?;', [duration, iid]);
+	    tx.executeSql('UPDATE ' + getWorkoutTableNameFromId(wid) + ' SET duration =? WHERE iid =?;', [duration, iid]);
 	});
 
     return {"iid": iid, "title": "Pause", "type": "pause", "duration": duration, "description": "" };
@@ -248,7 +305,7 @@ function deleteItemFromWorkout(wid, iidToRemove) {
     var db = getDatabase();
     db.transaction(
 	function(tx) {
-	    tx.executeSql('DELETE FROM workout_' + wid + ' WHERE iid=?;', [iidToRemove]);
+	    tx.executeSql('DELETE FROM ' + getWorkoutTableNameFromId(wid) + ' WHERE iid=?;', [iidToRemove]);
 	});
 }
 
@@ -272,64 +329,20 @@ function _getFreeWid() {
     return wid;
 }
 
-function _getNextIid(wid) {
+function _getFreeIid(wid) {
     var db = getDatabase();
-    var iid = -1;
+    var iid = 0;
+
     db.transaction(
     	function(tx) {
-    	    var query="SELECT * FROM workout_" + wid + ";";
-    	    var rs = tx.executeSql(query);
-    	    iid = rs.rows.length;
-    	});
-
-    // db.transaction(
-    // 	function(tx) {
-    // 	    var query="SELECT count(*) FROM workout_" + wid + ";";
-    // 	    var rs = tx.executeSql(query);
-    // 	    iid = rs.rows.item(0).value;
-    // 	    console.log("IIIIIIDDDDDDDDD: " + iid);
-    // 	});
-
-    // db.transaction( function(tx) {
-    // 	var rs = tx.executeSql("SELECT * FROM workout_" + wid ";");
-    // 	iid = rs.rows.length;
-    // });
-
+    	    var rs = tx.executeSql("SELECT MAX(iid) AS maxIid FROM " + getWorkoutTableNameFromId(wid) + ";");
+    	    iid = rs.rows.item(0).maxIid + 1;
+    	}
+    );
+    
     return iid;
 }
 
-function createDummyWorkout(wid){
-    var db = getDatabase();
-    db.transaction(
-    		   function(tx) {
-    		       var query="DROP TABLE workout_" + wid + ";";
-    		       tx.executeSql(query);
-    		   });
-
-    db.transaction(
-                function(tx) {
-                    var query="CREATE TABLE IF NOT EXISTS workout_" + wid + "(wid INTEGER, iid INTEGER, title TEXT, type TEXT, duration INTEGER, description TEXT);";
-                    tx.executeSql(query);
-                });
-
-    db.transaction(
-		   function(tx) {
-		       var query="INSERT OR REPLACE INTO workout_" + wid + " VALUES(" + wid + ", 0, 'Liegestütz', 'excercise', 30, 'sdfsdf');";
-		       tx.executeSql(query);
-		   });
-    db.transaction(
-		   function(tx) {
-		       var query="INSERT OR REPLACE INTO workout_" + wid + " VALUES(" + wid + ", 1, '', 'pause', 20, '');";
-		       tx.executeSql(query);
-		   });
-    db.transaction(
-		   function(tx) {
-		       var query="INSERT OR REPLACE INTO workout_" + wid + " VALUES(" + wid + ", 2, 'Sit-Ups', 'excercise', 30, 'sdfsdf');";
-		       tx.executeSql(query);
-		   });
-    db.transaction(
-		   function(tx) {
-		       var query="INSERT OR REPLACE INTO workout_" + wid + " VALUES(" + wid + ", 3, '', 'pause', 20, '');";
-		       tx.executeSql(query);
-		   });
+function getWorkoutTableNameFromId(workoutId){
+    return "workout_" + workoutId;
 }

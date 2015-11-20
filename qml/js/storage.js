@@ -196,6 +196,8 @@ function createWorkout(wid){
 function setWorkoutTitle(wid, title){
     var db = getDatabase();
 
+    console.log("setWorkoutTitle: ", wid, " ", title)
+    
     db.transaction(
 	function(tx) {
     	    var query="INSERT OR REPLACE INTO toc VALUES(" + wid + ", '" + title + "');";

@@ -4,8 +4,9 @@ import "../components"
 import "../js/storage.js" as Storage
 import "../js/env.js" as Env
 
-Dialog {
+Page {
     id: root
+    property variant parentPage: undefined
     property int currentWid: -1
     property string currentWTitle: ""
     property bool staging: false
@@ -15,12 +16,10 @@ Dialog {
 
         var db = Storage.getDatabase();
         db.transaction(function(tx) {
-            console.log("showWorkout SQL statement: ", "SELECT * FROM " + workout_name + " ORDER BY iid;")
             var rs = tx.executeSql("SELECT * FROM " + workout_name + " ORDER BY iid;");
-            console.log("Items for workout ", workout_name, ": ", rs.rows.length)
+
             for(var i = 0; i < rs.rows.length; i++) {
                 var dbItem = rs.rows.item(i);
-                console.log("Add item to model: ", dbItem.title, " ", dbItem.type)
                 workoutModel.append({"iid": dbItem.iid, "title": dbItem.title, "type": dbItem.type, "duration": dbItem.duration, "description": dbItem.description});
             }
         });
@@ -36,15 +35,8 @@ Dialog {
     }
     
     Component.onCompleted: {
-        // editing an existing workout
-        if(currentWid != -1){
-            console.log("EDIT EXISTING WORKOUT")
-            // workoutNameTF.text = root.currentWTitle
-            // showWorkout("workout_" + root.currentWid);
-        }
         // creating a new workout
-        else{
-            console.log("CREATE NEW WORKOUT")
+        if(currentWid == -1){
             staging = true;
             root.currentWid = Storage.createWorkout(-1);
         }
@@ -54,24 +46,11 @@ Dialog {
         if(status === PageStatus.Activating){
             showWorkout(Storage.getWorkoutTableNameFromId(currentWid));
         }
+        else if(status === PageStatus.Deactivating){
+            Storage.setWorkoutTitle(currentWid, currentWTitle)
+            parentPage.createWorkoutList()
+        }
     }
-
-    // user wants to save new entry data
-    // onAccepted: {
-    onRejected: {
-        console.log("SAVE WORKOUT: ", currentWTitle, " ", currentWid)
-        Storage.setWorkoutTitle(currentWid, currentWTitle)
-    }
-
-    // user has rejected editing entry data, check if there are unsaved details
-    // onRejected: {
-    //     if(staging){
-    //         console.log("DELETE WORKOUT")
-    //         Storage.deleteWorkout(root.currentWid)
-    //     }else{
-    //         console.log("CANCEL WORKOUT EDITING")
-    //     }
-    // }
 
     SilicaListView {
         id: itemList
@@ -85,50 +64,44 @@ Dialog {
         }
 
         VerticalScrollDecorator { flickable: itemList }
-
+        
         header: Column {
             id: column
             width: parent.width
 
-            DialogHeader {
-                id: dlgheader
-                //% "Save Workout"
-                cancelText: qsTrId("save-edited-workout")
+            PageHeader {
+                title: qsTr("Edit Workout")
             }
-
+            
             TextField {
                 id: workoutNameTF
                 width: parent.width
                 height: 100
                 text: root.currentWTitle
-                //: The placeholder for the name of the currently edited / created workout
-                //% "Workout name"
-                placeholderText: qsTrId("workout_name_editpage")
-                //: The label for the textfield in which the name of the currently edited / created workout is entered
-                //% "Workout name"
-                label: qsTrId("workout_name_label_editpage")
+                placeholderText: qsTr("Workout title")
+                label: qsTr("Workout title")
 
                 // workaround: TextField is not accessible from root item (because it's included in the header?)
                 onTextChanged: {root.currentWTitle = text}
             }
+
+            Rectangle {
+                id: spacerRect
+                width: parent.width
+                height: 50
+                color: "transparent"
+            }
         }
-        
+
         //     /* delegate: WorkoutItemDelegate {model: workoutModel; wid: root.currentWid} */
         delegate: ListItem {
             id: workoutItemDelegate
             width: parent.width
             menu: contextMenu
             
-            // anchors {
-            //     left: parent.left
-            //     right: parent.right
-            //     margins: Theme.paddingLarge
-            // }
-
             property int wid: currentWid
 
             function edit() {
-                console.log("EDIT ENTRY for WID: " + root.currentWid + " IID: " + iid + " duration: " + duration)
                 pageStack.push(Qt.resolvedUrl("EntryEditPage.qml"), {"currentWid": root.currentWid,
                 "currentIid": iid,
                 "currentIndex": index,
@@ -138,55 +111,55 @@ Dialog {
                 "title": title,
                 "description": description,
                 "duration": duration});
-        	 }
-          
-        	 function remove() {
-              remorseAction("Deleting", function() {
+            }
+            
+            function remove() {
+              remorseAction(qsTr("Deleting"), function() {
                   Storage.deleteItemFromWorkout(workoutItemDelegate.wid, iid);
                   workoutModel.remove(index);
               }, 2000)
-        	 }
+        	}
 
-            onClicked: { showMenu() }
+            onClicked: { edit() }
           
             Component {
-             id: contextMenu
-             IconContextMenu {
-                 IconMenuItem {
-                     text: "Edit"
-                     icon.source: "image://theme/icon-m-edit"
-                     onClicked: {
-                         hideMenu()
-                         edit()
-                     }
-                 }
-                 IconMenuItem {
-                     text: "Remove"
-                     icon.source: "image://theme/icon-m-delete"
-                     onClicked: {
-                         hideMenu()
-                         remove()
-                     }
-                 }
-                 IconMenuItem {
-                     text: "Move up"
-                     icon.source: "image://theme/icon-l-up"
-                     onClicked: {
-                         if(index > 0) {
-                             swapItems(index, index - 1);
-                         }
-                     }
-                 }
-                 IconMenuItem {
-                     text: "Move down"
-                     icon.source: "image://theme/icon-l-down"
-                     onClicked: {
-                         if(index < (workoutModel.count - 1)) {
-                             swapItems(index, index + 1);
-                         }
-                     }
-                 }
-             }
+                id: contextMenu
+                IconContextMenu {
+                    IconMenuItem {
+                        text: qsTr("Edit")
+                        icon.source: "image://theme/icon-m-edit"
+                        onClicked: {
+                            hideMenu()
+                            edit()
+                        }
+                    }
+                    IconMenuItem {
+                        text: qsTr("Remove")
+                        icon.source: "image://theme/icon-m-delete"
+                        onClicked: {
+                            hideMenu()
+                            remove()
+                        }
+                    }
+                    IconMenuItem {
+                        text: qsTr("Move up")
+                        icon.source: "image://theme/icon-l-up"
+                        onClicked: {
+                            if(index > 0) {
+                                swapItems(index, index - 1);
+                            }
+                        }
+                    }
+                    IconMenuItem {
+                        text: qsTr("Move down")
+                        icon.source: "image://theme/icon-l-down"
+                        onClicked: {
+                            if(index < (workoutModel.count - 1)) {
+                                swapItems(index, index + 1);
+                            }
+                        }
+                    }
+                }
             }		
 
             Column {
@@ -201,7 +174,7 @@ Dialog {
                     width: parent.width
                     Label {
                         width: parent.width - durationLBL.width
-                        text: if(type === "pause"){"Pause"}else{title}
+                        text: if(type === "pause"){qsTr("Pause")}else{title}
                         color: if(type === "pause"){Theme.secondaryColor}else{Theme.primaryColor}
                     }
                     Label {
@@ -214,7 +187,6 @@ Dialog {
 
                 Label {
                     id: descriptionLabel
-                    // width: workoutItemDelegate.width / 3 * 2
                     width: parent.width
                     text: if(type === "pause"){"PPPP"}else{description}
                     font.pixelSize: Theme.fontSizeTiny
@@ -230,26 +202,11 @@ Dialog {
             } // Column
         } // delegate
 
-                // // PullDownMenu {
-                //     //     MenuItem {
-                //         // 	text: "Workout Settings"
-                //         // 	onClicked: {
-                //             // 	    console.log("WORKOUT SETTINGS")
-                //             // 	    pageStack.push(Env.components.editWorkoutSettingsComponent)
-                //             // 	}
-                //             //     }
-                //             // }
-
-                // VerticalScrollDecorator {}
-                //         }
-            // } 
-        //}// column
-
         PushUpMenu {
+            visible: root.currentWTitle.length > 0
             MenuItem {
-                text: "Add Exercise"
+                text: qsTr("Add exercise")
                 onClicked: {
-                    console.log("ADD EXERCISE")
                     pageStack.push(Qt.resolvedUrl("EntryEditPage.qml"), {"currentWid": root.currentWid, 
                     "model": workoutModel,
                     "type": "exercise",
@@ -257,7 +214,7 @@ Dialog {
                 }
             }
             MenuItem {
-                text: "Add Pause"
+                text: qsTr("Add pause")
                 onClicked: {
                     pageStack.push(Qt.resolvedUrl("EntryEditPage.qml"), {"currentWid": root.currentWid, 
                     "model": workoutModel,

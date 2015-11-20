@@ -41,28 +41,30 @@
 #include <QTimer>
 #include <QProcess>
 #include <QQuickView>
-#include <notification.h>
 #include "applibrary.h"
 #include "viewhelper.h"
+#include "filemodel.h"
+#include "avatarimageprovider.h"
 
 int main(int argc, char *argv[])
 {
   QScopedPointer<QGuiApplication> application(SailfishApp::application(argc, argv));
   application->setApplicationName("harbour-schwarzenmaker");
 
-  qmlRegisterType<Notification>("harbour.schwarzenmaker.notifications", 1, 0, "Notification");
+  qmlRegisterType<FileModel>("harbour.schwarzenmaker.FileModel", 1, 0, "FileModel");
 
   appLibrary* applib = new appLibrary();
   QScopedPointer<ViewHelper> helper(new ViewHelper(application.data()));
+  AvatarImageProvider* avatarImageProvider = new AvatarImageProvider();
 
   QScopedPointer<QQuickView> view(SailfishApp::createView());
   QQmlEngine* engine = view->engine();
+  engine->addImageProvider(QLatin1String("avatarimage"), avatarImageProvider);
   QObject::connect(engine, SIGNAL(quit()), application.data(), SLOT(quit()));
 
   view->rootContext()->setContextProperty("appLibrary", applib);
   view->rootContext()->setContextProperty("viewHelper", helper.data());
-
-  // QTimer::singleShot(1, helper.data(), SLOT(checkActive()));
+  view->rootContext()->setContextProperty("avatarImageProvider", avatarImageProvider);
 
   view->setSource(SailfishApp::pathTo("qml/harbour-schwarzenmaker.qml"));
   view->show();

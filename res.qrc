@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>sounds/blip.wav</file>
+        <file>img/avatar_body.png</file>
+        <file>img/avatar_default.png</file>
     </qresource>
 </RCC>

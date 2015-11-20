@@ -16,6 +16,7 @@ Page {
     onStatusChanged: {
         if(status === PageStatus.Deactivating){
             viewHelper.hideOverlay()
+            // viewHelper.closeOverlay()
         }
     }
 
@@ -40,6 +41,7 @@ Page {
         }else{
             pageStack.pop()
             viewHelper.hideOverlay()
+            // viewHelper.closeOverlay()
         }
     }
 

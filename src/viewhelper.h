@@ -95,13 +95,13 @@ private:
 class ViewHelper : public QObject
 {
   Q_OBJECT
-  Q_CLASSINFO("D-Bus Interface", "harbour.batteryoverlay")
+  Q_CLASSINFO("D-Bus Interface", "harbour.schwarzenmaker") // necessary?
 
   public:
   explicit ViewHelper(QObject *parent = 0);
 
-  Q_INVOKABLE void closeOverlay();
-  Q_INVOKABLE void startOverlay();
+  // Q_INVOKABLE void closeOverlay();
+  // Q_INVOKABLE void startOverlay();
 
   Q_INVOKABLE void setCurrentExerciseTitle(QString title){m_msg.setCurrentExerciseTitle(title);}
   Q_INVOKABLE void setCurrentExerciseDescription(QString description){m_msg.setCurrentExerciseDescription(description);}
@@ -115,8 +115,8 @@ class ViewHelper : public QObject
 public slots:
   void checkActive();
 
-  Q_SCRIPTABLE Q_NOREPLY void show();
-  Q_SCRIPTABLE Q_NOREPLY void exit();
+  // Q_SCRIPTABLE Q_NOREPLY void show();
+  // Q_SCRIPTABLE Q_NOREPLY void exit();
   Q_SCRIPTABLE Q_NOREPLY void checkOverlay();
 
 signals:
@@ -125,12 +125,12 @@ signals:
 private:
   void showOverlay();
 
-  QQuickView *view;
-  bool m_isOverlay;
+  QQuickView *m_overlayView;
+  bool m_overlayActive;
   Message m_msg;		  
 
 private slots:
-  void onPackageStatusChanged(const QString &package, int status);
+  // void onPackageStatusChanged(const QString &package, int status);
 };
 
 #endif // VIEWHELPER_H

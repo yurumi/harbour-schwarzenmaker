@@ -13,11 +13,14 @@
 TARGET = harbour-schwarzenmaker
 
 CONFIG += sailfishapp c++11
-QT += dbus gui-private
+QT += dbus gui-private sql
 
 SOURCES += src/harbour-schwarzenmaker.cpp \
     src/applibrary.cpp \
-    src/viewhelper.cpp
+    src/viewhelper.cpp \
+    src/avatarimageprovider.cpp \
+    src/filemodel.cpp \
+    src/statfileinfo.cpp
 
 OTHER_FILES += qml/harbour-schwarzenmaker.qml \
     qml/cover/CoverPage.qml \
@@ -54,5 +57,11 @@ RESOURCES += \
 
 HEADERS += \
     src/applibrary.h \
-    src/viewhelper.h
+    src/viewhelper.h \
+    src/avatarimageprovider.h \
+    src/filemodel.h \
+    src/statfileinfo.h
+
+DISTFILES += \
+    qml/pages/DirectoryPage.qml
 

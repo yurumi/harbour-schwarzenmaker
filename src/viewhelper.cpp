@@ -1,3 +1,22 @@
+/*
+  Schwarzenmaker.
+  Copyright (C) 2015 Thomas Eigel
+  Contact: Thomas Eigel <yurumi@gmx.de>
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include "viewhelper.h"
 
 #include <qpa/qplatformnativeinterface.h>
@@ -12,71 +31,18 @@ ViewHelper::ViewHelper(QObject *parent) :
 {
 }
 
-// void ViewHelper::closeOverlay()
-// {
-//   QDBusInterface iface("harbour.schwarzenmaker.overlay", "/harbour/schwarzenmaker/overlay", "harbour.schwarzenmaker");
-//   iface.call(QDBus::NoBlock, "exit");
-// }
-
 void ViewHelper::checkOverlay()
 {
-  // qDebug() << "checkOverlay()";
-  // if (m_overlayActive) {
-  //   qDebug() << "  overlayRunning";
-  //   Q_EMIT overlayRunning();
-  // }
-  // else {
-  //   qDebug() << "  overlay NOT Running";
-  //   QDBusInterface iface("harbour.schwarzenmaker.overlay", "/harbour/schwarzenmaker/overlay", "harbour.schwarzenmaker");
-  //   iface.call(QDBus::NoBlock, "checkOverlay");
-  // }
 }
 
-// void ViewHelper::startOverlay()
-// {
-//     QDesktopServices::openUrl(QUrl::fromLocalFile("/usr/share/applications/harbour-batteryoverlay.desktop"));
-// }
 
 void ViewHelper::checkActive()
 {
-  // qDebug() << "checkActive()";
-  // bool inactive = QDBusConnection::sessionBus().registerService("harbour.schwarzenmaker.overlay");
-  // if(inactive){
-    // qDebug() << "  inactive";
-    showOverlay();
-  // }
-  // else {
-  //     bool newSettings = QDBusConnection::sessionBus().registerService("harbour.batteryoverlay.settings");
-  //     if (newSettings) {
-  //         showSettings();
-  //     }
-  //     else {
-  //         QDBusInterface iface("harbour.batteryoverlay.settings", "/harbour/batteryoverlay/settings", "harbour.batteryoverlay");
-  //         iface.call(QDBus::NoBlock, "show");
-  //         qGuiApp->exit(0);
-  //         return;
-  //     }
-  // }
-  // QDBusConnection::sessionBus().connect("", "", "com.jolla.jollastore", "packageStatusChanged", this, SLOT(onPackageStatusChanged(QString, int)));
+  showOverlay();
 }
-
-// void ViewHelper::show()
-// {
-//   if (m_overlayView) {
-//     m_overlayView->raise();
-//   }
-// }
-
-// void ViewHelper::exit()
-// {
-//   QTimer::singleShot(100, qGuiApp, SLOT(quit()));
-// }
 
 void ViewHelper::showOverlay()
 {
-  qDebug() << "showOverlay()";
-  // QDBusConnection::sessionBus().registerObject("/harbour/schwarzenmaker/overlay", this, QDBusConnection::ExportScriptableSlots | QDBusConnection::ExportAllSignals);
-
   m_overlayActive = true;
 
   qGuiApp->setApplicationName("Schwarzenmaker Overlay");
@@ -103,8 +69,6 @@ void ViewHelper::showOverlay()
     
   // m_overlayView->showNormal();
   hideOverlay();
-    
-  // Q_EMIT overlayRunning();
 }
 
 void ViewHelper::hideOverlay()
@@ -116,12 +80,3 @@ void ViewHelper::unhideOverlay()
 {
   m_overlayView->showNormal();
 }
-
-// void ViewHelper::onPackageStatusChanged(const QString &package, int status)
-// {
-//   qDebug() << "onPackageStatusChanged: " << package <<  ", " << status;
-//   if (package == "harbour-schwarzenmaker" && status != 1) {
-//     exit();
-//   }
-// }
-

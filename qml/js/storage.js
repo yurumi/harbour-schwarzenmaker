@@ -2,7 +2,6 @@
 
 function getDatabase() {
     return Sql.LocalStorage.openDatabaseSync("SchwarzenmakerDb", "1.0", "Schwarzenmaker Workout Database", 1000000);
-    //return openDatabaseSync("SchwarzenmakerDb", "1.0", "Schwarzenmaker Workout Database", 1000000);
 }
 
 function initializeDatabase() {

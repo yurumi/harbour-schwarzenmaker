@@ -1,8 +1,26 @@
+/*
+  Schwarzenmaker.
+  Copyright (C) 2015 Thomas Eigel
+  Contact: Thomas Eigel <yurumi@gmx.de>
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 import QtQuick 2.0
 import QtMultimedia 5.0
 import Sailfish.Silica 1.0
 import "../js/storage.js" as Storage
-import "../js/env.js" as Env
 
 Page {
     id: root
@@ -12,7 +30,8 @@ Page {
     property int activeEntry: -1
     property int entryDurationMs: 0
     property int entryElapsedTimeMs: 0
-
+    property string mainState: mainwindow.state
+    
     onStatusChanged: {
         if(status === PageStatus.Deactivating){
             viewHelper.hideOverlay()
@@ -51,6 +70,17 @@ Page {
         audibleTimer.volume = Storage.getSetting("AudibleTimerVolume")
     }
 
+    onMainStateChanged: {
+        if(mainState === "Play"){
+            entryTimer.start()
+        }else if(mainState === "Proceed"){
+            root.proceed()
+            mainwindow.state = "Play"
+        }else if(mainState === "Pause"){
+            entryTimer.stop()
+        }      
+    }
+    
     SequentialAnimation {
         id: pauseAnimation
         running: false
@@ -77,7 +107,7 @@ Page {
                 entryDurationMs = entry.duration
                 entryElapsedTimeMs = 0;
                 if(entry.type === "pause"){
-                    entryTitle.text = "Pause";
+                    entryTitle.text = qsTr("Pause");
                     entryDescription.text = "";
                 }else{
                     entryTitle.text = entry.title;
@@ -93,13 +123,13 @@ Page {
                     var upcomingEntry = entriesModel.get(root.activeEntry + 1);
                     var upcomingEntryDescription = ""
                     if(upcomingEntry.type === "pause"){
-                        upcomingEntryTitle.text = "Pause";                       
+                        upcomingEntryTitle.text = qsTr("Pause");                       
                     }else{
                         upcomingEntryTitle.text = upcomingEntry.title;
                         upcomingEntryDescription = upcomingEntry.description;
                     }
                 }else{
-                    upcomingEntryTitle.text = "FINISHED"
+                    upcomingEntryTitle.text = qsTr("FINISHED")
                 }
                 viewHelper.setNextExercise(upcomingEntryTitle.text);
                 viewHelper.setNextExerciseDescription(upcomingEntryDescription);
@@ -121,7 +151,7 @@ Page {
         interval: 100; running: false; repeat: false
         onTriggered: {
             viewHelper.checkActive()
-            proceed();
+            root.proceed();
         }
     }
 
@@ -247,7 +277,7 @@ Page {
             color: Theme.secondaryHighlightColor
             horizontalAlignment: Text.AlignHCenter
             font.pointSize: 25
-            text: "Next:"
+            text: qsTr("Next:")
         }
         
         Text {
@@ -274,7 +304,7 @@ Page {
             margins: Theme.paddingLarge
         }   
         icon.source: "image://theme/icon-m-next"
-        onClicked: proceed()
+        onClicked: root.proceed()
     }
 
     IconButton {
@@ -288,9 +318,8 @@ Page {
             margins: Theme.paddingLarge
         }
         icon.source: entryTimer.running ? "image://theme/icon-m-pause" : "image://theme/icon-m-play"
-        onClicked: {
-            entryTimer.running ? entryTimer.stop() : entryTimer.start()
-            entryTimer.running ? pauseAnimation.stop() : pauseAnimation.start()
+        onClicked: {            
+            (mainState === "Play") ? mainwindow.state = "Pause" : mainwindow.state = "Play"
         }
     }
 

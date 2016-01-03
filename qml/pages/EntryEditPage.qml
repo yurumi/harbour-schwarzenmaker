@@ -1,3 +1,22 @@
+/*
+  Schwarzenmaker.
+  Copyright (C) 2015 Thomas Eigel
+  Contact: Thomas Eigel <yurumi@gmx.de>
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../js/storage.js" as Storage
@@ -50,42 +69,35 @@ Dialog {
           DialogHeader {
               acceptText: {
                   if(type === "exercise"){
-                      edit ? "Save Exercise" : "Add Exercise"
+                      edit ? qsTr("Save Exercise") : qsTr("Add Exercise")
                   }else{
-                      edit ? "Save Pause" : "Add Pause"
+                      edit ? qsTr("Save Pause") : qsTr("Add Pause")
                   }
               } // acceptText
-              // title: {
-              //     if(type === "exercise"){
-              //         edit ? "Save Exercise" : "Add Exercise"
-              //     }else{
-              //         edit ? "Save Pause" : "Add Pause"	    
-              //     }
-              // } // title
           }
 
           TextField {
               id: entryTitleTextField
               visible: (type === "exercise")
               width: parent.width
-              label: "Title"
+              label: qsTr("Title")
               text: ""
-              placeholderText: "Set Title (mandatory)"
+              placeholderText: qsTr("Set Title")
           }
 
           TextField {
               id: entryDescriptionTextField
               visible: (type === "exercise")
               width: parent.width
-              label: "Description"
+              label: qsTr("Description")
               text: ""
-              placeholderText: "Set Description (optional)"
+              placeholderText: qsTr("Set Description (optional)")
           }
 
           Slider {
               id: durationSlider
               width: parent.width
-              label: "Duration"
+              label: qsTr("Duration")
               minimumValue: 0
               maximumValue: 300
               value: 20

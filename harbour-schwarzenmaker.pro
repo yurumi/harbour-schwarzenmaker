@@ -40,8 +40,6 @@ OTHER_FILES += qml/harbour-schwarzenmaker.qml \
     qml/components/IconMenuItem.qml \
     qml/js/storage.js
 
-include(third_party/notifications.pri)
-
 # to disable building translations every time, comment out the
 # following CONFIG line
 CONFIG += sailfishapp_i18n

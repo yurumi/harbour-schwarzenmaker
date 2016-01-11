@@ -89,21 +89,21 @@ Page {
           source: "qrc:/img/avatar_body.png"
       }
 
-      Image {
-          id: avatarHead
-          anchors {
-              horizontalCenter: parent.horizontalCenter
-              top: parent.top
-          }
-          source: "image://avatarimage/avatar_head"
+//      Image {
+//          id: avatarHead
+//          anchors {
+//              horizontalCenter: parent.horizontalCenter
+//              top: parent.top
+//          }
+//          source: "image://avatarimage/avatar_head"
 
-          MouseArea {
-              anchors.fill: parent
-              onClicked: {
-                  pageStack.push(Qt.resolvedUrl("DirectoryPage.qml"))
-              }
-          }
-      }
+//          MouseArea {
+//              anchors.fill: parent
+//              onClicked: {
+//                  pageStack.push(Qt.resolvedUrl("DirectoryPage.qml"))
+//              }
+//          }
+//      }
   }
 
   

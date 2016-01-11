@@ -33,7 +33,7 @@
 #include "applibrary.h"
 #include "viewhelper.h"
 #include "filemodel.h"
-#include "avatarimageprovider.h"
+// #include "avatarimageprovider.h"
 
 int main(int argc, char *argv[])
 {
@@ -44,16 +44,16 @@ int main(int argc, char *argv[])
 
   appLibrary* applib = new appLibrary();
   QScopedPointer<ViewHelper> helper(new ViewHelper(application.data()));
-  AvatarImageProvider* avatarImageProvider = new AvatarImageProvider();
+  // AvatarImageProvider* avatarImageProvider = new AvatarImageProvider();
 
   QScopedPointer<QQuickView> view(SailfishApp::createView());
   QQmlEngine* engine = view->engine();
-  engine->addImageProvider(QLatin1String("avatarimage"), avatarImageProvider);
+  // engine->addImageProvider(QLatin1String("avatarimage"), avatarImageProvider);
   QObject::connect(engine, SIGNAL(quit()), application.data(), SLOT(quit()));
 
   view->rootContext()->setContextProperty("appLibrary", applib);
   view->rootContext()->setContextProperty("viewHelper", helper.data());
-  view->rootContext()->setContextProperty("avatarImageProvider", avatarImageProvider);
+  // view->rootContext()->setContextProperty("avatarImageProvider", avatarImageProvider);
 
   view->setSource(SailfishApp::pathTo("qml/harbour-schwarzenmaker.qml"));
   view->show();

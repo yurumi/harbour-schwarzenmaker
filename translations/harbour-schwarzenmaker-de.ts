@@ -73,14 +73,6 @@
 <context>
     <name>SettingsPage</name>
     <message>
-        <source>Clear local database</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Database is going to be cleared</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Save Settings</source>
         <translation type="unfinished"></translation>
     </message>
@@ -188,6 +180,10 @@
     </message>
     <message>
         <source>Create workout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pull down to create a workout.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -192,6 +192,43 @@ function createWorkout(wid){
     return wid;
 }
 
+function duplicateWorkout(wid){
+    var db = getDatabase();
+    var newWtitle = getWorkoutTitle(wid) + " (dup)"
+    var newWid = createWorkout(-1)
+
+    console.log("SET Dup WORKOUT TITLE: ", newWtitle, " WID: ", newWid, "FROM: ", wid)
+    db.transaction(
+	function(tx) {
+	    var query="INSERT OR REPLACE INTO toc VALUES(" + newWid + ", '" + newWtitle + "');";
+	    tx.executeSql(query);
+	}
+    )
+
+    db.transaction(
+	function(tx) {
+	    var rs = tx.executeSql("SELECT * FROM " + getWorkoutTableNameFromId(wid))
+
+	    for(var i = 0; i < rs.rows.length; i++) {
+		var dbItem = rs.rows.item(i);
+
+		var query="INSERT INTO " + getWorkoutTableNameFromId(newWid)
+		    + " VALUES(" 
+		    + dbItem.iid + ", " 
+		    + newWid + ", " 
+		    + "'" + dbItem.title + "', "
+		    + "'" + dbItem.type + "', " 
+		    + dbItem.duration + ", " 
+		    + "'" + dbItem.description + "');";
+		console.log("duplicateWorkout SQL query: ", query)
+		tx.executeSql(query);
+            }
+    	}
+    );
+    
+    return newWid;
+}
+
 function setWorkoutTitle(wid, title){
     var db = getDatabase();
 
@@ -203,6 +240,22 @@ function setWorkoutTitle(wid, title){
     	    tx.executeSql(query);
     	}
     );
+}
+
+function getWorkoutTitle(wid){
+    var db = getDatabase();
+    var wtitle
+
+    db.transaction(
+	function(tx) {
+    	    var rs = tx.executeSql("SELECT wtitle FROM toc WHERE wid = ?", [wid]);
+	    wtitle = rs.rows.item(0).wtitle
+    	}
+    );
+
+    console.log("getWorkoutTitle: ", wtitle)
+    
+    return wtitle
 }
 
 function swapItemId(workoutId, firstItemId, secondItemId){

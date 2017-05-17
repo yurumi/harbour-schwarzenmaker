@@ -171,19 +171,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Edit workout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Remove workout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Create workout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Pull down to create a workout.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duplicate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

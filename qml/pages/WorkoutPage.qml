@@ -134,10 +134,17 @@ Page {
               pageStack.push(Qt.resolvedUrl("WorkoutEditPage.qml"), {"parentPage": root, "currentWid": wid, "currentWTitle": wtitle})
           }
 
+          function duplicate() {
+              var newWid = Storage.duplicateWorkout(wid)
+              pageStack.push(Qt.resolvedUrl("WorkoutEditPage.qml"), {"parentPage": root, "currentWid": newWid, "currentWTitle": wtitle + " (dup)"})
+              // createWorkoutList()
+          }
+
           function remove() {
-              remorseAction(qsTr("Deleting"), function() { 
+              remorseAction(qsTr("Deleting"), function() {
+                  var _index = index
                   Storage.deleteWorkout(wid);
-                  listView.model.remove(index);
+                  listView.model.remove(_index);
               })
           }
 
@@ -180,11 +187,15 @@ Page {
               id: contextMenu
               ContextMenu {
                   MenuItem {
-                      text: qsTr("Edit workout")
+                      text: qsTr("Edit")
                       onClicked: edit()
                   }
                   MenuItem {
-                      text: qsTr("Remove workout")
+                      text: qsTr("Duplicate")
+                      onClicked: duplicate()
+                  }
+                  MenuItem {
+                      text: qsTr("Delete")
                       onClicked: remove()
                   }
               }

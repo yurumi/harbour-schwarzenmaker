@@ -13,8 +13,8 @@ Name:       harbour-schwarzenmaker
 %{!?qtc_make:%define qtc_make make}
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    My SailfishOS Application
-Version:    0.9
-Release:    2
+Version:    1.0
+Release:    1
 Group:      Qt/Qt
 License:    LICENSE
 URL:        http://example.org/

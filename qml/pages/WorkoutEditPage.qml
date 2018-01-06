@@ -99,7 +99,6 @@ Page {
             TextField {
                 id: workoutNameTF
                 width: parent.width
-                height: 100
                 text: root.currentWTitle
                 placeholderText: qsTr("Workout title")
                 label: qsTr("Workout title")
@@ -111,7 +110,7 @@ Page {
             Rectangle {
                 id: spacerRect
                 width: parent.width
-                height: 50
+                height: 50 * Theme.pixelRatio
                 color: "transparent"
             }
         }
@@ -202,7 +201,7 @@ Page {
                     }
                     Label {
                         id: durationLBL
-                        width: 50
+                        width: 50 * Theme.pixelRatio
                         text: duration + "\""
                         color: if(type === "pause"){Theme.secondaryColor}else{Theme.primaryColor}
                     }

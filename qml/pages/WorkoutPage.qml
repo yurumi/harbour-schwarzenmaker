@@ -164,7 +164,7 @@ Page {
               
               Label {
                   id: durationLBL
-                  width: 50
+                  width: 50 * Theme.pixelRatio
                   horizontalAlignment: Text.AlignRight
                   text: {
                       if(model.wduration >= 60){

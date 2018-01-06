@@ -8,8 +8,8 @@ ListItem {
   menu: contextMenu
   /* height: if(type === "pause"){40}else{80} */
 
-  property int titleRowHeight: 40
-  property int descriptionRowHeight: 40
+  property int titleRowHeight: 40* Theme.pixelRatio
+  property int descriptionRowHeight: 40* Theme.pixelRatio
   property variant model: 0
   property int wid: -1
 

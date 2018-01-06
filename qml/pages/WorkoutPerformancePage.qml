@@ -66,8 +66,8 @@ Page {
 
     Component.onCompleted: {
         buildEntriesModel("workout_" + root.currentWid);
-        overlayTimer.running = true;
         audibleTimer.volume = Storage.getSetting("AudibleTimerVolume")
+        initTimer.start();
     }
 
     onMainStateChanged: {
@@ -112,7 +112,7 @@ Page {
                 }else{
                     entryTitle.text = entry.title;
                     entryDescription.text = entry.description;
-                }          
+                }
                 entryTimer.start();
                 viewHelper.setCurrentExerciseTitle(entryTitle.text);
                 viewHelper.setCurrentExerciseDescription(entryDescription.text);
@@ -147,11 +147,12 @@ Page {
     }
 
     Timer {
-        id: overlayTimer
+        id: initTimer
         interval: 100; running: false; repeat: false
         onTriggered: {
             viewHelper.checkActive()
             root.proceed();
+            mainwindow.state = "Play"
         }
     }
 
@@ -176,7 +177,6 @@ Page {
                 viewHelper.hideOverlay()
             }
             
-            console.log("blank")
             appLibrary.setBlankingMode(true)
 
             var remainingTimeMs = root.entryDurationMs - root.entryElapsedTimeMs;
@@ -213,11 +213,11 @@ Page {
         anchors {
             horizontalCenter: parent.horizontalCenter
             bottom: progressCircleBackground.top
-            bottomMargin: 80
+            bottomMargin: 80 * Theme.pixelRatio
         }
         color: Theme.highlightColor
         horizontalAlignment: Text.AlignHCenter
-        font.pointSize: 45; // style: Text.Sunken; styleColor: "#AAAAAA"
+        font.pointSize: 45 * Theme.pixelRatio; // style: Text.Sunken; styleColor: "#AAAAAA"
         // font.bold: true
     }
 
@@ -226,17 +226,17 @@ Page {
         anchors {
             horizontalCenter: parent.horizontalCenter
             top: entryTitle.bottom
-            topMargin: 5
+            topMargin: 5 * Theme.pixelRatio
         }
         color: Theme.highlightColor
         horizontalAlignment: Text.AlignHCenter
-        font.pointSize: 20; // style: Text.Sunken; styleColor: "#AAAAAA"
+        font.pointSize: 20 * Theme.pixelRatio; // style: Text.Sunken; styleColor: "#AAAAAA"
     }
 
     Item {
         id: progressCircleBackground
         width: parent.width
-        height: 300
+        height: 300 * Theme.pixelRatio
         anchors.centerIn: parent
 
         ProgressCircle {
@@ -251,19 +251,19 @@ Page {
             anchors.centerIn: parent
             color: Theme.highlightColor
             horizontalAlignment: Text.AlignHCenter
-            font.pointSize: 64; style: Text.Sunken; styleColor: "#AAAAAA"
+            font.pointSize: 64 * Theme.pixelRatio; style: Text.Sunken; styleColor: "#AAAAAA"
         }
 
     }
 
     Rectangle {
         id: upcomingEntryTitleRect
-        height: 50
-        width: upcomingEntryTitle.width + nextLabel.width + 50
+        height: 50 * Theme.pixelRatio
+        width: upcomingEntryTitle.width + nextLabel.width + 50 * Theme.pixelRatio
         x: Screen.width - width
         anchors {
             top: progressCircleBackground.bottom
-            topMargin: 80
+            topMargin: 80 * Theme.pixelRatio
         }
         color: "transparent"
 
@@ -276,7 +276,7 @@ Page {
             }
             color: Theme.secondaryHighlightColor
             horizontalAlignment: Text.AlignHCenter
-            font.pointSize: 25
+            font.pointSize: 25 * Theme.pixelRatio
             text: qsTr("Next:")
         }
         
@@ -289,7 +289,7 @@ Page {
             }
             color: Theme.highlightColor
             horizontalAlignment: Text.AlignRight
-            font.pointSize: 25
+            font.pointSize: 25 * Theme.pixelRatio
         }
     }
     
@@ -309,8 +309,8 @@ Page {
 
     IconButton {
         id: pauseButton
-        width: 100
-        height: 100
+        width: 100 * Theme.pixelRatio
+        height: 100 * Theme.pixelRatio
         scale: 2.0
         anchors {
             right: parent.right
@@ -318,7 +318,7 @@ Page {
             margins: Theme.paddingLarge
         }
         icon.source: entryTimer.running ? "image://theme/icon-m-pause" : "image://theme/icon-m-play"
-        onClicked: {            
+        onClicked: {
             (mainState === "Play") ? mainwindow.state = "Pause" : mainwindow.state = "Play"
         }
     }

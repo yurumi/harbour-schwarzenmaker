@@ -5,6 +5,9 @@ import harbour.schwarzenmaker.FileModel 1.0
 Page {
     id: page
     allowedOrientations: Orientation.All
+
+    readonly property string pageType: "Directory"
+
     property string dir: "/home/nemo"
     property bool initial: false // this is set to true if the page is initial page
 

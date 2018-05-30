@@ -23,29 +23,94 @@ import Sailfish.Silica 1.0
 CoverBackground {
     id: coverPage
     Label {
-        id: label
-        anchors.centerIn: parent
-        text: "Schwarzenmaker"
+        id: coverEntryTitle
+        anchors {
+            horizontalCenter: parent.horizontalCenter
+            bottom: coverProgressCircleBackground.top
+            bottomMargin: 25 * Theme.pixelRatio
+        }
+
+        text: {
+            if(typeof pageStack.currentPage.getCoverText == "function"){
+                pageStack.currentPage.getCoverText()
+            }else{
+                "Schwarzenmaker"
+            }
+        }
     }
 
-    // CoverActionList {
-    //     id: coverActionList
+    Item {
+        id: coverProgressCircleBackground
+        width: parent.width
+        height: 150 * Theme.pixelRatio
+        anchors.centerIn: parent
+        visible: pageStack.currentPage.pageType === "WorkoutPerformance"
 
-    //     CoverAction {
-    //         iconSource: "image://theme/icon-cover-next"
-    //         onTriggered: {
-    //             mainwindow.proceed()
-    //         }
-    //     }
+        ProgressCircle {
+            id: coverProgressCircle
+            anchors.fill: parent
+            progressColor: Theme.highlightColor
+            backgroundColor: Theme.highlightDimmerColor
 
-    //     CoverAction {
-    //         id: coverActionPause
-    //         iconSource: "image://theme/icon-cover-pause"
-    //         onTriggered: {
-    //             mainwindow.pause()
-    //         }
-    //     }
-    // }
+            value: {
+                if(typeof pageStack.currentPage.getCoverText == "function"){
+                    pageStack.currentPage.getProgress()
+                }else{
+                    0.0
+                }
+            }
+        }
+
+        Text {
+            id: coverEntryDuration
+            anchors.centerIn: parent
+            color: Theme.highlightColor
+            horizontalAlignment: Text.AlignHCenter
+            font.pointSize: 40 * Theme.pixelRatio; style: Text.Sunken; styleColor: "#AAAAAA"
+            text: if(pageStack.currentPage.pageType === "WorkoutPerformance"){
+                pageStack.currentPage.getRemainingTimeText()
+            }else{
+                ""
+            }
+        }
+
+    }
+
+    Image {
+        id: coverImage
+        source: "qrc:///img/arnold.png"
+        asynchronous: true
+        opacity: 0.5
+        visible: pageStack.currentPage.pageType !== "WorkoutPerformance"
+        width: parent.width
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        fillMode: Image.PreserveAspectFit
+    }
+
+    CoverActionList {
+        id: coverActionListPerformance
+
+        enabled: pageStack.currentPage.pageType === "WorkoutPerformance"
+
+        CoverAction {
+            id: coverActionPause
+            iconSource: {
+                mainwindow.state === "Pause" ? "image://theme/icon-cover-play" : "image://theme/icon-cover-pause"
+            }
+            onTriggered: {
+                mainwindow.pause()
+            }
+        }
+
+        CoverAction {
+            iconSource: "image://theme/icon-cover-next"
+            onTriggered: {
+                if(typeof pageStack.currentPage.proceed == "function"){
+                    pageStack.currentPage.proceed()
+                }
+            }
+        }
+
+    }
 }
-
-

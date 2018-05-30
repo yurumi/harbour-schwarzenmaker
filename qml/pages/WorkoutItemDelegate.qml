@@ -8,6 +8,8 @@ ListItem {
   menu: contextMenu
   /* height: if(type === "pause"){40}else{80} */
 
+  readonly property string pageType: "WorkoutItemDelegate"
+
   property int titleRowHeight: 40* Theme.pixelRatio
   property int descriptionRowHeight: 40* Theme.pixelRatio
   property variant model: 0

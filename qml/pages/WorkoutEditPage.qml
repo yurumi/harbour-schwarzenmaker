@@ -24,6 +24,9 @@ import "../js/storage.js" as Storage
 
 Page {
     id: root
+
+    readonly property string pageType: "WorkoutEdit"
+
     property variant parentPage: undefined
     property int currentWid: -1
     property string currentWTitle: ""

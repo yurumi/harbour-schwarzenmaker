@@ -23,7 +23,9 @@ import "../js/storage.js" as Storage
 
 Dialog {
     id: settingsPage
-    
+
+    readonly property string pageType: "Settings"
+
     acceptDestinationAction: PageStackAction.Pop
     canAccept: true
 

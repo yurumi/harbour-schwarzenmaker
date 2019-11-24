@@ -80,7 +80,7 @@ Dialog {
 
             Item {
                 id: overlayTestItem
-                height: exerciseLabel.height + 50
+                height: exerciseLabel.height + 50 * Theme.pixelRatio
                 anchors {
                     left: parent.left
                     right: parent.right
@@ -89,7 +89,7 @@ Dialog {
                 
                 Rectangle {
                     id: exerciseLabel
-                    height: 50
+                    height: 50 * Theme.pixelRatio
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.right: parent.right
@@ -99,7 +99,7 @@ Dialog {
                         id: highlightTestLBL
                         anchors {
                             left: parent.left
-                            leftMargin: 10
+                            leftMargin: 10 * Theme.pixelRatio
                             top: parent.top
                         }
                         color: Theme.highlightColor
@@ -109,7 +109,7 @@ Dialog {
                     Label {
                         anchors {
                             left: highlightTestLBL.right
-                            leftMargin: 10
+                            leftMargin: 10 * Theme.pixelRatio
                             top: parent.top
                         }
                         color: Theme.secondaryHighlightColor
@@ -122,7 +122,6 @@ Dialog {
                     anchors{
                         left: parent.left
                         right: parent.right
-                        rightMargin: 50
                         top: exerciseLabel.bottom
                     }
                     height: overlayProgressBarThicknessSlider.value

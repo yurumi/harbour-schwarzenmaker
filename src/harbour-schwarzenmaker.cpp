@@ -44,13 +44,13 @@ int main(int argc, char *argv[])
   qmlRegisterType<Message>("harbour.schwarzenmaker.Message", 1, 0, "Message");
 
   appLibrary* applib = new appLibrary();
-  QScopedPointer<ViewHelper> helper(new ViewHelper(application.data()));
   // AvatarImageProvider* avatarImageProvider = new AvatarImageProvider();
 
   QScopedPointer<QQuickView> view(SailfishApp::createView());
   QQmlEngine* engine = view->engine();
   // engine->addImageProvider(QLatin1String("avatarimage"), avatarImageProvider);
   QObject::connect(engine, SIGNAL(quit()), application.data(), SLOT(quit()));
+  QScopedPointer<ViewHelper> helper(new ViewHelper(view.data()));
 
   view->rootContext()->setContextProperty("appLibrary", applib);
   view->rootContext()->setContextProperty("viewHelper", helper.data());

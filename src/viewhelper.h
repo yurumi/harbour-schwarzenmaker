@@ -117,7 +117,7 @@ class ViewHelper : public QObject
   Q_CLASSINFO("D-Bus Interface", "harbour.schwarzenmaker") // necessary?
 
   public:
-  explicit ViewHelper(QObject *parent = 0);
+  explicit ViewHelper(QQuickView *parent = 0);
 
   // Q_INVOKABLE void closeOverlay();
   // Q_INVOKABLE void startOverlay();

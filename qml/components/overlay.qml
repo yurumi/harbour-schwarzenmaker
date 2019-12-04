@@ -77,9 +77,8 @@ Item {
             id: exerciseInfoRect
             x: 0
             y: 0
-            height: 70
+            height: 70 * Theme.pixelRatio
             width: parent.width
-            // color: "green"
             color: Theme.highlightDimmerColor
 
             Label {
@@ -92,7 +91,7 @@ Item {
                     //     right: parent.right
                     top: parent.top
                 }
-                color: Theme.highlightColor
+                color: Theme.primaryColor
             }
             Label {
                 id: exerciseDescriptionLBL
@@ -116,8 +115,8 @@ Item {
                     right: parent.right
                     top: exerciseTitleLBL.bottom
                 }
-                color: Theme.highlightColor
-                font.pixelSize: 20
+                color: Theme.primaryColor
+                font.pixelSize: 20 * Theme.pixelRatio
             }
 
             // Column {

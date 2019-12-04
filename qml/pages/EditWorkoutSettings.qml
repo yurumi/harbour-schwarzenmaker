@@ -23,7 +23,9 @@ import "../js/storage.js" as Storage
 
 Dialog {
   id: root
-  
+
+  readonly property string pageType: "EditWorkoutSettings"
+
   property string origTitle: ""
 
   signal workoutListChanged

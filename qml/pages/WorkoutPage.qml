@@ -23,7 +23,9 @@ import "../js/storage.js" as Storage
 
 Page {
   id: root
-  
+
+  readonly property string pageType: "Workout"
+
   property string table_prefix: "workout_"
 
   function createWorkoutList(){
@@ -49,11 +51,11 @@ Page {
           for(var j = 0; j < entries.rows.length; j++){
               wduration += entries.rows.item(j).duration
           }
-        
+
           overviewModel.append({"wid": dbItem.wid, "wtitle": dbItem.wtitle, "wduration": wduration});
       }
   }
-  
+
   Component.onCompleted: {
       createWorkoutList();
   }
@@ -79,7 +81,7 @@ Page {
           anchors.fill: parent
           color: "red"
           opacity: 0.3
-      }     
+      }
 
       Image {
           id: avatarBody
@@ -106,7 +108,7 @@ Page {
 //      }
   }
 
-  
+
   SilicaListView {
       id: listView
       anchors {
@@ -156,12 +158,12 @@ Page {
                   margins: Theme.paddingLarge
                   verticalCenter: parent.verticalCenter
               }
-              
+
               Label {
                   width: delegateRow.width - durationLBL.width
                   text: model.wtitle
               }
-              
+
               Label {
                   id: durationLBL
                   width: 50 * Theme.pixelRatio
@@ -173,7 +175,7 @@ Page {
                           return (minutes + "' " + seconds + "\"")
                       }else{
                           return (model.wduration + "\"")
-                      }         
+                      }
                   }
               }
           }

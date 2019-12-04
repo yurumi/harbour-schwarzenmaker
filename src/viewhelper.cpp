@@ -24,11 +24,13 @@
 #include <QTimer>
 #include <QDebug>
 
-ViewHelper::ViewHelper(QObject *parent) :
+ViewHelper::ViewHelper(QQuickView *parent) :
   QObject(parent),
   m_overlayView(NULL),
   m_overlayActive(false)
 {
+    m_overlayView = SailfishApp::createView();
+    m_overlayView->setParent(parent);
 }
 
 void ViewHelper::checkOverlay()
@@ -48,7 +50,6 @@ void ViewHelper::showOverlay()
   qGuiApp->setApplicationName("Schwarzenmaker Overlay");
   qGuiApp->setApplicationDisplayName("Schwarzenmaker Overlay");
 
-  m_overlayView = SailfishApp::createView();
   m_overlayView->setTitle("SchwarzenmakerOverlay");
 
   QColor color;

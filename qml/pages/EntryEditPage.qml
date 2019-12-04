@@ -23,6 +23,9 @@ import "../js/storage.js" as Storage
 
 Dialog {
   id: root
+
+  readonly property string pageType: "EntryEdit"
+
   property int currentWid: -1
   property int currentIid: -1
   property int currentIndex: -1

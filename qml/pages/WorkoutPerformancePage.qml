@@ -24,19 +24,33 @@ import "../js/storage.js" as Storage
 
 Page {
     id: root
-    
+
+    readonly property string pageType: "WorkoutPerformance"
+
     property int currentWid: -1
     property string currentWTitle: ""
     property int activeEntry: -1
     property int entryDurationMs: 0
     property int entryElapsedTimeMs: 0
     property string mainState: mainwindow.state
-    
+
     onStatusChanged: {
         if(status === PageStatus.Deactivating){
             viewHelper.hideOverlay()
             // viewHelper.closeOverlay()
         }
+    }
+
+    function getCoverText() {
+        return entryTitle.text
+    }
+
+    function getProgress() {
+        return progressCircle.value
+    }
+
+    function getRemainingTimeText() {
+        return entryDuration.text
     }
 
     function buildEntriesModel(workout_name){
@@ -56,7 +70,7 @@ Page {
         activeEntry += 1;
 
         if(activeEntry < entriesModel.count){
-            proceedAnimation.start()        
+            proceedAnimation.start()
         }else{
             pageStack.pop()
             viewHelper.hideOverlay()
@@ -73,14 +87,11 @@ Page {
     onMainStateChanged: {
         if(mainState === "Play"){
             entryTimer.start()
-        }else if(mainState === "Proceed"){
-            root.proceed()
-            mainwindow.state = "Play"
         }else if(mainState === "Pause"){
             entryTimer.stop()
-        }      
+        }
     }
-    
+
     SequentialAnimation {
         id: pauseAnimation
         running: false
@@ -89,7 +100,7 @@ Page {
         NumberAnimation { target: entryDuration; property: "opacity"; to: 0.5; duration: 500 }
         NumberAnimation { target: entryDuration; property: "opacity"; to: 1.0; duration: 500 }
     }
-    
+
     SequentialAnimation {
         id: proceedAnimation
         running: false
@@ -102,7 +113,7 @@ Page {
         }
         ScriptAction {
             script: {
-                // current exercise                
+                // current exercise
                 var entry = entriesModel.get(root.activeEntry);
                 entryDurationMs = entry.duration
                 entryElapsedTimeMs = 0;
@@ -113,17 +124,19 @@ Page {
                     entryTitle.text = entry.title;
                     entryDescription.text = entry.description;
                 }
-                entryTimer.start();
                 viewHelper.setCurrentExerciseTitle(entryTitle.text);
                 viewHelper.setCurrentExerciseDescription(entryDescription.text);
                 viewHelper.setExerciseDuration(entryDurationMs / 1000);
+                if(mainState === "Play"){
+                    entryTimer.start();
+                }
 
                 // upcoming excercise
                 if(activeEntry < (entriesModel.count - 1)){
                     var upcomingEntry = entriesModel.get(root.activeEntry + 1);
                     var upcomingEntryDescription = ""
                     if(upcomingEntry.type === "pause"){
-                        upcomingEntryTitle.text = qsTr("Pause");                       
+                        upcomingEntryTitle.text = qsTr("Pause");
                     }else{
                         upcomingEntryTitle.text = upcomingEntry.title;
                         upcomingEntryDescription = upcomingEntry.description;
@@ -164,7 +177,7 @@ Page {
     ListModel {
         id: entriesModel
     }
-    
+
     Timer {
         id: entryTimer
         interval: 1000
@@ -176,14 +189,14 @@ Page {
             }else{
                 viewHelper.hideOverlay()
             }
-            
+
             appLibrary.setBlankingMode(true)
 
             var remainingTimeMs = root.entryDurationMs - root.entryElapsedTimeMs;
 
             // update progress circle
             progressCircle.value = (1.0 - (1.0 / entryDurationMs * entryElapsedTimeMs))
-            
+
             // switch to next exercise or pause
             if(remainingTimeMs < 0){
                 root.proceed();
@@ -200,7 +213,7 @@ Page {
             entryElapsedTimeMs += entryTimer.interval;
         }
 
-        onRunningChanged: running ? pauseAnimation.stop() : pauseAnimation.start() 
+        onRunningChanged: running ? pauseAnimation.stop() : pauseAnimation.start()
     }
 
     PageHeader {
@@ -245,7 +258,7 @@ Page {
             progressColor: Theme.highlightColor
             backgroundColor: Theme.highlightDimmerColor
         }
-        
+
         Text {
             id: entryDuration
             anchors.centerIn: parent
@@ -279,7 +292,7 @@ Page {
             font.pointSize: 25 * Theme.pixelRatio
             text: qsTr("Next:")
         }
-        
+
         Text {
             id: upcomingEntryTitle
             anchors {
@@ -292,20 +305,6 @@ Page {
             font.pointSize: 25 * Theme.pixelRatio
         }
     }
-    
-    IconButton {
-        id: skipButton
-        width: pauseButton.width
-        height: pauseButton.height
-        scale: pauseButton.scale
-        anchors {
-            left: parent.left
-            bottom: parent.bottom
-            margins: Theme.paddingLarge
-        }   
-        icon.source: "image://theme/icon-m-next"
-        onClicked: root.proceed()
-    }
 
     IconButton {
         id: pauseButton
@@ -313,7 +312,7 @@ Page {
         height: 100 * Theme.pixelRatio
         scale: 2.0
         anchors {
-            right: parent.right
+            left: parent.left
             bottom: parent.bottom
             margins: Theme.paddingLarge
         }
@@ -321,6 +320,20 @@ Page {
         onClicked: {
             (mainState === "Play") ? mainwindow.state = "Pause" : mainwindow.state = "Play"
         }
+    }
+
+    IconButton {
+        id: skipButton
+        width: pauseButton.width
+        height: pauseButton.height
+        scale: pauseButton.scale
+        anchors {
+            right: parent.right
+            bottom: parent.bottom
+            margins: Theme.paddingLarge
+        }
+        icon.source: "image://theme/icon-m-next"
+        onClicked: root.proceed()
     }
 
 }

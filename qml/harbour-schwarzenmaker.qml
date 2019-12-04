@@ -17,7 +17,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.0
+import QtQuick 2.2
 import Sailfish.Silica 1.0
 import "pages"
 import "js/storage.js" as Storage
@@ -35,20 +35,17 @@ ApplicationWindow
     },
     State {
         name: "Pause"
-    },
-    State {
-        name: "Proceed"
     }
     ]
-    
-    
-    function proceed(){
-        mainwindow.state = "Proceed"
-    }
 
     function pause(){
         console.log("PAUSE")
-        // (pageStack.currentPage.state === "Play") ? pageStack.currentPage.state = "Pause" : pageStack.currentPage.state = "Play"
+        if(state === "Play") {
+            state = "Pause"
+        }
+        else if(state === "Pause") {
+            state = "Play"
+        }
     }
 
     Component.onCompleted: {
@@ -57,5 +54,3 @@ ApplicationWindow
         Storage.printTables()
     }
 }
-
-

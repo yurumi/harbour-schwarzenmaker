@@ -41,6 +41,7 @@ int main(int argc, char *argv[])
   application->setApplicationName("harbour-schwarzenmaker");
 
   qmlRegisterType<FileModel>("harbour.schwarzenmaker.FileModel", 1, 0, "FileModel");
+  qmlRegisterType<Message>("harbour.schwarzenmaker.Message", 1, 0, "Message");
 
   appLibrary* applib = new appLibrary();
   QScopedPointer<ViewHelper> helper(new ViewHelper(application.data()));

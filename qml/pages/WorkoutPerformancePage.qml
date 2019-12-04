@@ -74,7 +74,17 @@ Page {
         }else{
             pageStack.pop()
             viewHelper.hideOverlay()
-            // viewHelper.closeOverlay()
+        }
+    }
+
+    Connections {
+        target: Qt.application
+        onStateChanged: {
+            if(Qt.application.state == Qt.ApplicationInactive){
+                viewHelper.unhideOverlay()
+            }else{
+                viewHelper.hideOverlay()
+            }
         }
     }
 
@@ -163,7 +173,7 @@ Page {
         id: initTimer
         interval: 100; running: false; repeat: false
         onTriggered: {
-            viewHelper.checkActive()
+            viewHelper.createOverlay()
             root.proceed();
             mainwindow.state = "Play"
         }
@@ -184,12 +194,6 @@ Page {
         repeat: true
         triggeredOnStart: true
         onTriggered: {
-            if(Qt.application.state == Qt.ApplicationInactive){
-                viewHelper.unhideOverlay()
-            }else{
-                viewHelper.hideOverlay()
-            }
-
             appLibrary.setBlankingMode(true)
 
             var remainingTimeMs = root.entryDurationMs - root.entryElapsedTimeMs;

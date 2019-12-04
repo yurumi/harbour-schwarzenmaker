@@ -132,21 +132,17 @@ class ViewHelper : public QObject
   Q_INVOKABLE void unhideOverlay();
 
 public slots:
-  void checkActive();
+  void createOverlay();
 
   // Q_SCRIPTABLE Q_NOREPLY void show();
   // Q_SCRIPTABLE Q_NOREPLY void exit();
-  Q_SCRIPTABLE Q_NOREPLY void checkOverlay();
 
 signals:
   Q_SCRIPTABLE void overlayRunning();
 
 private:
-  void showOverlay();
-
   QQuickView *m_overlayView;
-  bool m_overlayActive;
-  Message m_msg;		  
+  Message m_msg;
 
 private slots:
   // void onPackageStatusChanged(const QString &package, int status);

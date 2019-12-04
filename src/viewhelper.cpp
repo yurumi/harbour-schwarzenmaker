@@ -26,25 +26,12 @@
 
 ViewHelper::ViewHelper(QObject *parent) :
   QObject(parent),
-  m_overlayView(NULL),
-  m_overlayActive(false)
+  m_overlayView(NULL)
 {
 }
 
-void ViewHelper::checkOverlay()
+void ViewHelper::createOverlay()
 {
-}
-
-
-void ViewHelper::checkActive()
-{
-  showOverlay();
-}
-
-void ViewHelper::showOverlay()
-{
-  m_overlayActive = true;
-
   qGuiApp->setApplicationName("Schwarzenmaker Overlay");
   qGuiApp->setApplicationDisplayName("Schwarzenmaker Overlay");
 
@@ -59,14 +46,13 @@ void ViewHelper::showOverlay()
   m_overlayView->setColor(color);
   m_overlayView->setClearBeforeRendering(true);
 
+  m_overlayView->rootContext()->setContextProperty("msg", &m_msg);
   m_overlayView->setSource(SailfishApp::pathTo("qml/components/overlay.qml"));
   m_overlayView->create();
   QPlatformNativeInterface *native = QGuiApplication::platformNativeInterface();
   native->setWindowProperty(m_overlayView->handle(), QLatin1String("CATEGORY"), "notification");
   native->setWindowProperty(m_overlayView->handle(), QLatin1String("MOUSE_REGION"), QRegion(0, 0, 0, 0));
 
-  m_overlayView->rootContext()->setContextProperty("msg", &m_msg);
-    
   // m_overlayView->showNormal();
   hideOverlay();
 }

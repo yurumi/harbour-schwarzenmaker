@@ -77,17 +77,6 @@ Page {
         }
     }
 
-    Connections {
-        target: Qt.application
-        onStateChanged: {
-            if(Qt.application.state == Qt.ApplicationInactive){
-                viewHelper.unhideOverlay()
-            }else{
-                viewHelper.hideOverlay()
-            }
-        }
-    }
-
     Component.onCompleted: {
         buildEntriesModel("workout_" + root.currentWid);
         audibleTimer.volume = Storage.getSetting("AudibleTimerVolume")
@@ -194,6 +183,12 @@ Page {
         repeat: true
         triggeredOnStart: true
         onTriggered: {
+            if(Qt.application.state == Qt.ApplicationInactive){
+                viewHelper.unhideOverlay()
+            }else{
+                viewHelper.hideOverlay()
+            }
+
             appLibrary.setBlankingMode(true)
 
             var remainingTimeMs = root.entryDurationMs - root.entryElapsedTimeMs;
